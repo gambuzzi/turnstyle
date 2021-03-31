@@ -1,7 +1,5 @@
 <h1 align="center">
-  🎟️
-  <br/>
-  turnstyle
+	serial pipelines
 </h1>
 
 <p align="center">
