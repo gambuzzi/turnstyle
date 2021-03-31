@@ -81,17 +81,19 @@ export class OctokitGitHub implements GitHub {
       options2.branch = branch;
     }
 
-    const in_progress: Array<Run> = await this.octokit.paginate(
+    const in_progress: Promise<Array<Run>> = this.octokit.paginate(
       this.octokit.actions.listWorkflowRuns.endpoint.merge(options)
     );
-    const queued: Array<Run> = await this.octokit.paginate(
+
+    const queued: Promise<Array<Run>> = this.octokit.paginate(
       this.octokit.actions.listWorkflowRuns.endpoint.merge(options2)
     );
 
-    const concatenated: Array<Run> = [...in_progress, ...queued];
+    const to_concatenate: Array<Array<Run>> = await Promise.all([
+      in_progress,
+      queued,
+    ]);
 
-    const ret: Promise<Array<Run>> = Promise.resolve(concatenated);
-
-    return ret;
+    return Promise.resolve(([] as Array<Run>).concat(...to_concatenate));
   };
 }
