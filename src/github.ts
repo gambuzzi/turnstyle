@@ -62,21 +62,38 @@ export class OctokitGitHub implements GitHub {
     branch: string | undefined,
     workflow_id: number
   ) => {
-    const options: Octokit.EndpointOptions = {
+    // const options: Octokit.EndpointOptions = {
+    //   owner,
+    //   repo,
+    //   workflow_id,
+    //   // status: "in_progress,queued",
+    // };
+
+    // if (branch) {
+    //   options.branch = branch;
+    // }
+
+    // const the_runs: Run[] = await this.octokit.paginate(
+    //   this.octokit.actions.listWorkflowRuns.endpoint.merge(options)
+    // );
+
+    const options: Octokit.ActionsListWorkflowRunsParams = {
       owner,
       repo,
       workflow_id,
-      //      status: "in_progress",
+      per_page: 100,
     };
 
     if (branch) {
       options.branch = branch;
     }
 
-    const the_runs: Run[] = await this.octokit.paginate(
-      this.octokit.actions.listWorkflowRuns.endpoint.merge(options)
-    );
+    const response: Octokit.ActionsListWorkflowRunsResponse = (
+      await this.octokit.actions.listWorkflowRuns(options)
+    ).data;
 
-    return Promise.resolve(the_runs.filter((x) => x.status != "completed"));
+    return Promise.resolve(
+      response.workflow_runs.filter((x) => x.status != "completed")
+    );
   };
 }
